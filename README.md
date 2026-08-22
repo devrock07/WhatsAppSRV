@@ -55,6 +55,23 @@ WhatsAppSRV relays chat and server events, renders real player skins and a graph
 - Exact sender + exact full-command allowlists for any optional console commands
 - Colored, fixed-width startup branding with built-in DevRock credits
 
+## Gallery
+
+<table>
+  <tr>
+    <td align="center" width="55%">
+      <img src="docs/images/whatsapp-player-events.png" alt="WhatsAppSRV player join and leave notifications with Minecraft skin heads" width="100%">
+      <br>
+      <sub><strong>Player events</strong> — join and leave cards with real Minecraft skin heads and the current online count.</sub>
+    </td>
+    <td align="center" width="45%">
+      <img src="docs/images/whatsapp-status-command.png" alt="WhatsAppSRV graphical server status response in WhatsApp" width="100%">
+      <br>
+      <sub><strong>Live server status</strong> — TPS, memory, uptime, version, and online players from the WhatsApp <code>/status</code> command.</sub>
+    </td>
+  </tr>
+</table>
+
 ## Requirements
 
 - Paper or Spigot 1.16.5 or newer
