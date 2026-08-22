@@ -1,15 +1,42 @@
-# WhatsAppSRV
+<h1 align="center">WhatsAppSRV</h1>
 
-[![Build](https://github.com/devrock07/WhatsAppSRV/actions/workflows/build.yml/badge.svg)](https://github.com/devrock07/WhatsAppSRV/actions/workflows/build.yml)
-[![Latest release](https://img.shields.io/github/v/release/devrock07/WhatsAppSRV?display_name=tag)](https://github.com/devrock07/WhatsAppSRV/releases/latest)
-[![License](https://img.shields.io/badge/license-MIT-25D366.svg)](LICENSE)
+<p align="center"><strong>Bridge your Minecraft server and WhatsApp community with one JAR.</strong></p>
 
-Bring a Minecraft server and a WhatsApp chat together with one Paper/Spigot plugin.
+<p align="center">
+  <a href="https://github.com/devrock07/WhatsAppSRV/actions/workflows/build.yml"><img alt="Build" src="https://github.com/devrock07/WhatsAppSRV/actions/workflows/build.yml/badge.svg"></a>
+  <a href="https://github.com/devrock07/WhatsAppSRV/releases/latest"><img alt="Latest release" src="https://img.shields.io/github/v/release/devrock07/WhatsAppSRV?display_name=tag&color=25D366"></a>
+  <a href="LICENSE"><img alt="License" src="https://img.shields.io/badge/license-MIT-25D366.svg"></a>
+  <img alt="Paper and Spigot 1.16.5+" src="https://img.shields.io/badge/Paper%20%7C%20Spigot-1.16.5%2B-62B47A">
+</p>
 
-WhatsAppSRV relays chat and server events, renders player skins and a graphical server-status card, and exposes a deliberately small set of safe WhatsApp commands. The JAR manages its own local Node.js + `whatsapp-web.js` bridge, so it is suitable for Linux Pterodactyl hosts on both x64 and ARM64.
+<p align="center">
+  <a href="https://github.com/devrock07/WhatsAppSRV/releases/latest"><strong>Download latest</strong></a>
+  · <a href="#quick-start">Quick start</a>
+  · <a href="#commands-from-whatsapp">WhatsApp commands</a>
+  · <a href="SECURITY.md">Security</a>
+</p>
+
+<p align="center">
+  <img src="docs/images/console-banner-v1.0.1.png" alt="WhatsAppSRV v1.0.1 startup banner in a Pterodactyl Minecraft console" width="900">
+</p>
+
+<p align="center"><sub>The real v1.0.1 startup banner running on a Pterodactyl-hosted Minecraft server.</sub></p>
+
+WhatsAppSRV relays chat and server events, renders real player skins and a graphical server-status card, and exposes a deliberately small set of safe WhatsApp commands. Its private Node.js + `whatsapp-web.js` bridge is installed and managed automatically, including on Linux x64 and ARM64 Pterodactyl hosts.
 
 > [!WARNING]
 > WhatsAppSRV uses the unofficial `whatsapp-web.js` client. It is not affiliated with or endorsed by WhatsApp or Meta. Automated accounts can be logged out, rate-limited, or restricted. Avoid spam and use a separate WhatsApp account you can afford to lose.
+
+## At a glance
+
+| | |
+| --- | --- |
+| **Install** | Upload one JAR; the private bridge and browser are prepared automatically. |
+| **Minecraft** | Paper or Spigot 1.16.5 and newer. |
+| **Hosting** | Linux x64 and ARM64, including restricted Pterodactyl containers. |
+| **WhatsApp target** | Select one group or DM by its readable name. |
+| **Session** | Linked-device login persists across normal server restarts. |
+| **Created by** | [DevRock](https://github.com/devrock07). |
 
 ## Highlights
 
