@@ -99,6 +99,12 @@ final class InboundCommandHandler {
                 reply(message, "Pong! The Minecraft server is online with " + Bukkit.getOnlinePlayers().size()
                         + "/" + Bukkit.getMaxPlayers() + " players.", true);
                 return;
+            case "about":
+            case "credits":
+                reply(message, "*WhatsAppSRV v" + plugin.getDescription().getVersion()
+                        + "*\nMinecraft <-> WhatsApp Bridge\nMade by *DevRock*\n"
+                        + "github.com/devrock07/WhatsAppSRV", true);
+                return;
             case "whitelist":
                 handleWhitelist(message, commandLine);
                 return;
@@ -114,6 +120,7 @@ final class InboundCommandHandler {
                 .append("/tps - Paper server tick rate\n")
                 .append("/version - Minecraft server version\n")
                 .append("/ping - check whether the bridge is responding\n")
+                .append("/about - WhatsAppSRV version and credits\n")
                 .append("/help - show this help");
 
         if (hasAdminAccess(message)) {

@@ -26,6 +26,7 @@ WhatsAppSRV relays chat and server events, renders player skins and a graphical 
 - Graphical `/status` card with server icon, TPS, memory, uptime, version, players, and skin heads
 - Admin-only `/whitelist add`, `/whitelist remove`, and `/whitelist list`
 - Exact sender + exact full-command allowlists for any optional console commands
+- Colored, fixed-width startup branding with built-in DevRock credits
 
 ## Requirements
 
@@ -41,7 +42,7 @@ The plugin bytecode targets Java 8 for broad API compatibility, but modern Paper
 
 ## Quick start
 
-1. Download `WhatsAppSRV-1.0.0.jar` from the [latest GitHub release](https://github.com/devrock07/WhatsAppSRV/releases/latest).
+1. Download `WhatsAppSRV-1.0.1.jar` from the [latest GitHub release](https://github.com/devrock07/WhatsAppSRV/releases/latest).
 2. Upload it to the server's `plugins` directory.
 3. Start the Minecraft server and allow the first-start installation to finish. Small hosts can take several minutes.
 4. In WhatsApp, open **Linked devices → Link a device** and scan the QR shown in the Pterodactyl console. You can also download `plugins/WhatsAppSRV/bridge/qr.png` through the host file manager.
@@ -73,6 +74,7 @@ All commands require `whatsappsrv.admin`, which defaults to server operators.
 | `/wasrv senders` | Privately show recently observed sender IDs in the Minecraft console. |
 | `/wasrv test` | Queue a test message to the selected WhatsApp chat. |
 | `/wasrv reload` | Reload configuration and restart the embedded bridge. |
+| `/wasrv credits`, `/wasrv about` | Show the colored WhatsAppSRV banner, version, and creator credit. |
 
 `/wasrv senders` exists for configuration only. Sender IDs are never exposed by a WhatsApp command.
 
@@ -87,6 +89,7 @@ A message beginning with `/` in the selected chat is treated as a command and is
 | `/tps` | Read-only | Paper's 1, 5, and 15 minute TPS values. |
 | `/version` | Read-only | Full Minecraft server version. |
 | `/ping` | Read-only | Bridge/server response check and player count. |
+| `/about`, `/credits` | Read-only | WhatsAppSRV version, project link, and creator credit. |
 | `/help` | Read-only | Available WhatsApp commands. |
 | `/whitelist add <username>` | WhatsApp group admin | Add one validated Minecraft username to the whitelist. |
 | `/whitelist remove <username>` | WhatsApp group admin | Remove one validated Minecraft username from the whitelist. |
@@ -144,6 +147,7 @@ The generated configuration is `plugins/WhatsAppSRV/config.yml`. Important secti
 | `formats` | Outbound and inbound message templates. |
 | `incoming.max-message-codepoints` | Maximum WhatsApp text relayed into Minecraft. |
 | `runtime` | Automatic startup, Node version, custom executable, and install timeout. |
+| `console-banner.enabled` | Show the colored ASCII startup banner and DevRock credit. |
 
 After editing configuration, run `/wasrv reload`. Do not hand-edit `bridge/config.json`; it is regenerated from the private plugin configuration.
 
@@ -224,6 +228,10 @@ See [CONTRIBUTING.md](CONTRIBUTING.md) before submitting a change.
 ## Project status
 
 WhatsApp Web changes without notice, so occasional compatibility updates are expected. Report reproducible bugs through GitHub Issues, but send security reports privately as described in [SECURITY.md](SECURITY.md).
+
+## Credits
+
+Created by [DevRock](https://github.com/devrock07). Run `/wasrv credits` at any time to show the in-console credit banner.
 
 ## License
 

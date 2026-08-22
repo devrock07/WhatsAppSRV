@@ -76,6 +76,7 @@ public final class WhatsAppSRVPlugin extends JavaPlugin implements Listener {
         if (enabled("forward.server-status")) {
             getServer().getScheduler().runTaskLater(this, () -> sendConfigured("formats.server-start"), 20L * 45L);
         }
+        printStartupBanner();
         getLogger().info("WhatsAppSRV enabled. Use /whatsappsrv status to test the local bridge.");
     }
 
@@ -412,7 +413,12 @@ public final class WhatsAppSRVPlugin extends JavaPlugin implements Listener {
     @Override
     public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
         if (args.length == 0) {
-            sender.sendMessage(color("&eUsage: /" + label + " <status|chats|select|senders|test|reload>"));
+            sender.sendMessage(color("&eUsage: /" + label + " <status|chats|select|senders|test|reload|credits>"));
+            return true;
+        }
+
+        if (args[0].equalsIgnoreCase("credits") || args[0].equalsIgnoreCase("about")) {
+            sendBranding(sender);
             return true;
         }
 
@@ -543,6 +549,39 @@ public final class WhatsAppSRVPlugin extends JavaPlugin implements Listener {
 
         sender.sendMessage(color("&cUnknown subcommand."));
         return true;
+    }
+
+    private void printStartupBanner() {
+        if (!getConfig().getBoolean("console-banner.enabled", true)) return;
+        sendBranding(Bukkit.getConsoleSender());
+    }
+
+    private void sendBranding(CommandSender sender) {
+        for (ConsoleBranding.Line line : ConsoleBranding.startupLines(getDescription().getVersion())) {
+            ChatColor color;
+            switch (line.style) {
+                case BORDER:
+                    color = ChatColor.DARK_GREEN;
+                    break;
+                case LOGO:
+                    color = ChatColor.GREEN;
+                    break;
+                case TAGLINE:
+                    color = ChatColor.AQUA;
+                    break;
+                case CREDIT:
+                    color = ChatColor.GOLD;
+                    break;
+                case VERSION:
+                    color = ChatColor.YELLOW;
+                    break;
+                default:
+                    color = ChatColor.DARK_GRAY;
+            }
+            String emphasis = line.style == ConsoleBranding.Style.LOGO
+                    || line.style == ConsoleBranding.Style.CREDIT ? ChatColor.BOLD.toString() : "";
+            sender.sendMessage(color + emphasis + line.text);
+        }
     }
 
     private boolean enabled(String path) {

@@ -4,6 +4,21 @@ All notable changes to WhatsAppSRV are documented here.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and this project follows [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.0.1] - 2026-08-22
+
+### Added
+
+- Colored, fixed-width ASCII startup banner designed for Minecraft and Pterodactyl consoles.
+- Boxed `Made by DevRock` credit and version display.
+- `/wasrv credits` and `/wasrv about` Minecraft admin subcommands.
+- `/about` and `/credits` read-only WhatsApp commands.
+- `console-banner.enabled` configuration toggle for quiet startup logs.
+
+### Changed
+
+- Updated public release metadata and documentation for v1.0.1.
+- Kept the embedded bridge dependency marker unchanged, so upgrading from v1.0.0 does not force an unnecessary npm/Chromium reinstall.
+
 ## [1.0.0] - 2026-08-22
 
 First supported public release.

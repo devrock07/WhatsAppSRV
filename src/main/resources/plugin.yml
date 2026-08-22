@@ -1,5 +1,5 @@
 name: WhatsAppSRV
-version: 1.0.0
+version: 1.0.1
 main: dev.codex.whatsappsrv.WhatsAppSRVPlugin
 api-version: 1.16
 author: Dev Rock
@@ -10,7 +10,7 @@ commands:
   whatsappsrv:
     aliases: [wasrv]
     description: Manage the WhatsAppSRV bridge
-    usage: /whatsappsrv <status|chats|select|senders|test|reload>
+    usage: /whatsappsrv <status|chats|select|senders|test|reload|credits>
     permission: whatsappsrv.admin
 permissions:
   whatsappsrv.admin:

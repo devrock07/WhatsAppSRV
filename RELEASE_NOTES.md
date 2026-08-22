@@ -1,19 +1,16 @@
-# WhatsAppSRV v1.0.0
+# WhatsAppSRV v1.0.1
 
-The first supported public release of WhatsAppSRV turns a Paper/Spigot server and one selected WhatsApp group or DM into a polished two-way community bridge.
+WhatsAppSRV v1.0.1 is a branding and presentation release for the public Minecraft-to-WhatsApp bridge.
 
-## What is included
+## New in this release
 
-- One JAR: the plugin installs and manages its private Node.js/WhatsApp bridge.
-- Linux Pterodactyl support on x64 and ARM64, including the ARM64 Chromium runtime path.
-- Persistent QR login, readable group/DM selection, and clear readiness diagnostics.
-- Minecraft chat, joins, leaves, deaths, advancements, and lifecycle notifications.
-- Real player-head images through SkinsRestorer or Bukkit, with safe Steve/Alex fallback.
-- Emoji-preserving inbound chat and useful labels for stickers and other WhatsApp media.
-- Direct WhatsApp command replies with ⏳ while processing and ✅/❌ on completion.
-- A graphical `/status` card with server health, memory, uptime, version, icon, TPS, and online player heads.
-- Safe read-only status commands and dedicated group-admin whitelist add/remove/list commands.
-- Optional arbitrary console commands remain disabled unless the sender passes the admin gate, is explicitly allowlisted for console access, and the exact complete command is allowlisted.
+- A colored, fixed-width `WhatsAppSRV` ASCII banner that stays aligned in Paper and Pterodactyl consoles.
+- A boxed **Made by DevRock** credit and visible plugin version at startup.
+- `/wasrv credits` and `/wasrv about` for showing the banner again without restarting.
+- `/about` and `/credits` inside the selected WhatsApp chat.
+- `console-banner.enabled: false` for server owners who prefer quiet startup logs.
+
+All bridge, session, chat relay, player-head, status-card, whitelist, and security behavior from v1.0.0 remains intact.
 
 ## Install
 
@@ -25,7 +22,7 @@ The first supported public release of WhatsAppSRV turns a Paper/Spigot server an
 
 Keep at least 750 MB of persistent storage free (1 GB recommended) and ensure the container allows outbound HTTPS and child processes.
 
-Upgrading from a private preview build triggers one fresh npm dependency install. Keep the server running until the bridge reports that it has started; the saved WhatsApp session is preserved.
+Upgrading from v1.0.0 does not force an npm or Chromium reinstall. The saved WhatsApp linked-device session is preserved.
 
 ## Important security note
 

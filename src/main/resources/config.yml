@@ -5,6 +5,10 @@ target-chat-id: ""
 target-chat-name: ""
 poll-interval-seconds: 2
 
+# Prints a colored, ASCII-only WhatsAppSRV / DevRock banner when the plugin enables.
+console-banner:
+  enabled: true
+
 # Messages beginning with / are handled here and are never broadcast as ordinary Minecraft chat.
 whatsapp-commands:
   enabled: true
