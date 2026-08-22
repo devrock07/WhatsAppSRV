@@ -1,0 +1,65 @@
+name: Bug report
+description: Report a reproducible WhatsAppSRV problem
+title: "[Bug]: "
+labels: [bug]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for helping improve WhatsAppSRV. Never attach your session folder, API token, live QR image, or private sender IDs.
+  - type: input
+    id: version
+    attributes:
+      label: WhatsAppSRV version
+      placeholder: v1.0.0
+    validations:
+      required: true
+  - type: input
+    id: server
+    attributes:
+      label: Server software and Java
+      placeholder: Paper 1.21.x, Java 21
+    validations:
+      required: true
+  - type: dropdown
+    id: architecture
+    attributes:
+      label: Host architecture
+      options:
+        - Linux x64
+        - Linux ARM64
+        - Custom/external runtime
+    validations:
+      required: true
+  - type: textarea
+    id: problem
+    attributes:
+      label: What happened?
+      description: Include the expected result and the actual result.
+    validations:
+      required: true
+  - type: textarea
+    id: reproduce
+    attributes:
+      label: Reproduction steps
+      placeholder: |
+        1. Start with...
+        2. Run...
+        3. Observe...
+    validations:
+      required: true
+  - type: textarea
+    id: logs
+    attributes:
+      label: Relevant sanitized logs
+      description: Remove tokens, sender IDs, phone numbers, QR data, and session paths before posting.
+      render: text
+  - type: checkboxes
+    id: checks
+    attributes:
+      label: Safety check
+      options:
+        - label: I removed all login/session material, API tokens, QR data, phone numbers, and private sender IDs.
+          required: true
+        - label: I searched existing issues and read the troubleshooting section.
+          required: true

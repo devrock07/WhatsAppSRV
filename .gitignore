@@ -1,0 +1,58 @@
+# Java build outputs
+/target/
+/build/
+/out/
+/.gradle/
+*.class
+*.jar
+*.war
+*.zip
+
+# Embedded bridge dependencies and generated state
+/bridge/node_modules/
+/bridge/config.json
+/bridge/qr.png
+/bridge/.install-complete-*
+/node_modules/
+**/.wwebjs_auth/
+**/.wwebjs_cache/
+
+# Plugin runtime data (when the repository is used as a test server folder)
+/session/
+/runtime/
+/browser-cache/
+/browser-work*/
+/logs/
+/plugins/
+/world/
+/world_nether/
+/world_the_end/
+/server.properties
+/server-icon.png
+/eula.txt
+
+# Credentials and local overrides
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+*.p12
+*.pfx
+
+# Editors and operating systems
+/.idea/
+/.vscode/
+*.iml
+*.swp
+*.swo
+.DS_Store
+Thumbs.db
+Desktop.ini
+
+# Logs, diagnostics, and crash dumps
+*.log
+*.log.*
+hs_err_pid*
+replay_pid*
+crash-reports/

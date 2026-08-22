@@ -1,0 +1,60 @@
+name: Build
+
+on:
+  push:
+    branches: ["main"]
+    tags: ["v*"]
+  pull_request:
+    branches: ["main"]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: build-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  verify:
+    name: Verify JAR and bridge
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+
+    steps:
+      - name: Check out source
+        uses: actions/checkout@v4
+
+      - name: Set up Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: "17"
+          cache: maven
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "24"
+
+      - name: Check bridge syntax
+        run: |
+          node --check bridge/index.js
+          node --check bridge/.puppeteerrc.cjs
+
+      - name: Verify locked bridge dependencies
+        run: npm ci --ignore-scripts --omit=optional --prefix bridge
+
+      - name: Audit production dependencies
+        run: npm audit --omit=dev --omit=optional --prefix bridge
+
+      - name: Build shaded plugin
+        run: mvn --batch-mode --no-transfer-progress clean verify
+
+      - name: Upload plugin artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: WhatsAppSRV-${{ github.sha }}
+          path: target/WhatsAppSRV.jar
+          if-no-files-found: error
+          retention-days: 14

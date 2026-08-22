@@ -1,0 +1,18 @@
+name: WhatsAppSRV
+version: 1.0.0
+main: dev.codex.whatsappsrv.WhatsAppSRVPlugin
+api-version: 1.16
+author: Dev Rock
+description: Bridges Minecraft chat and server events with a WhatsApp chat.
+website: https://github.com/devrock07/WhatsAppSRV
+softdepend: [SkinsRestorer]
+commands:
+  whatsappsrv:
+    aliases: [wasrv]
+    description: Manage the WhatsAppSRV bridge
+    usage: /whatsappsrv <status|chats|select|senders|test|reload>
+    permission: whatsappsrv.admin
+permissions:
+  whatsappsrv.admin:
+    default: op
+    description: Allows administration of WhatsAppSRV.

@@ -1,0 +1,73 @@
+bridge-url: "http://127.0.0.1:3210"
+api-token: "GENERATE_AUTOMATICALLY"
+target-chat-id: ""
+# Filled automatically by /wasrv select <number>; this is only for readable status output.
+target-chat-name: ""
+poll-interval-seconds: 2
+
+# Messages beginning with / are handled here and are never broadcast as ordinary Minecraft chat.
+whatsapp-commands:
+  enabled: true
+  reply-format: "🤖 *Minecraft:*\n%message%"
+  cooldown-seconds: 2
+  max-player-names: 30
+  max-command-length: 256
+  max-response-characters: 2000
+  # Empty means anyone in the selected WhatsApp chat may use the built-in read-only commands.
+  # Run /wasrv senders privately from the Minecraft console to discover sender IDs.
+  allowed-sender-ids: []
+  # /whitelist add|remove|list is automatically available to admins of the selected WhatsApp group.
+  # Put trusted sender IDs here only when using an admin through a DM or when group metadata is unavailable.
+  admin-sender-ids: []
+  console:
+    # Off by default. It requires admin access, an explicit console sender ID, AND an exact command.
+    enabled: false
+    allowed-sender-ids: []
+    # Entries match the complete command exactly; arguments are not implicitly allowed.
+    # Example: ["tps", "whitelist list"]
+    allowlist: []
+
+# Join/leave events are sent as an image containing the player's real skin head.
+# SkinsRestorer is preferred when installed; otherwise Bukkit profile data is used.
+# A normal Steve/Alex head is the final fallback when no usable skin exists.
+player-heads:
+  enabled: true
+  joins: true
+  leaves: true
+
+# /status replies with a graphical card containing live server metrics and player heads.
+status-card:
+  # Empty uses the server MOTD as the card title.
+  server-name: ""
+  max-player-heads: 10
+  show-server-icon: true
+
+incoming:
+  # Unicode emoji is preserved. Actual rendering depends on the Minecraft client's font/resource pack.
+  max-message-codepoints: 512
+
+runtime:
+  auto-start: true
+  node-version: "24.15.0"
+  # Keep "auto" unless Node.js 24+ is already installed at a specific path.
+  node-executable: "auto"
+  install-timeout-minutes: 15
+
+forward:
+  minecraft-chat: true
+  whatsapp-to-minecraft: true
+  joins: true
+  leaves: true
+  deaths: true
+  advancements: true
+  server-status: true
+
+formats:
+  minecraft-chat: "*<%player%>* %message%"
+  whatsapp-chat: "&a[WhatsApp] &f<%sender%> %message%"
+  join: "🟢 *%player% joined the server*\n👥 Online: *%online%/%max_players%*"
+  leave: "🔴 *%player% left the server*\n👥 Online: *%online%/%max_players%*"
+  death: "☠️ %message%"
+  advancement: "🏆 *%player%* completed `%advancement%`"
+  server-start: "✅ *Minecraft server started*"
+  server-stop: "⛔ *Minecraft server stopped*"

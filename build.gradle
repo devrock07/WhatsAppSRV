@@ -1,0 +1,52 @@
+plugins {
+    id 'java'
+    id 'com.github.johnrengelman.shadow' version '8.1.1'
+}
+
+group = 'dev.codex.whatsappsrv'
+version = '1.0.0'
+
+repositories {
+    mavenCentral()
+    maven { url = 'https://hub.spigotmc.org/nexus/content/repositories/snapshots/' }
+}
+
+dependencies {
+    compileOnly 'org.spigotmc:spigot-api:1.16.5-R0.1-SNAPSHOT'
+    implementation 'com.google.code.gson:gson:2.11.0'
+    implementation 'org.apache.commons:commons-compress:1.28.0'
+    implementation 'org.tukaani:xz:1.10'
+    testImplementation 'org.junit.jupiter:junit-jupiter:5.11.4'
+}
+
+java {
+    sourceCompatibility = JavaVersion.VERSION_1_8
+    targetCompatibility = JavaVersion.VERSION_1_8
+}
+
+tasks.withType(JavaCompile).configureEach {
+    options.encoding = 'UTF-8'
+    options.release = 8
+}
+
+processResources {
+    from('bridge') {
+        into 'embedded-bridge'
+        include 'index.js', 'package.json', 'package-lock.json', '.puppeteerrc.cjs'
+    }
+}
+
+shadowJar {
+    archiveFileName = 'WhatsAppSRV.jar'
+    relocate 'com.google.gson', 'dev.codex.whatsappsrv.libs.gson'
+    relocate 'org.apache.commons', 'dev.codex.whatsappsrv.libs.commons'
+    relocate 'org.tukaani.xz', 'dev.codex.whatsappsrv.libs.xz'
+    append 'META-INF/LICENSE.txt'
+    append 'META-INF/NOTICE.txt'
+}
+
+build.dependsOn shadowJar
+
+test {
+    useJUnitPlatform()
+}
