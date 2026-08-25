@@ -2,6 +2,9 @@ package dev.codex.whatsappsrv;
 
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
+import org.bukkit.Location;
+import org.bukkit.Material;
+import org.bukkit.World;
 import org.bukkit.advancement.Advancement;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
@@ -64,7 +67,7 @@ public final class WhatsAppSRVPlugin extends JavaPlugin implements Listener {
         processManager = new BridgeProcessManager(this);
         getServer().getPluginManager().registerEvents(this, this);
         if (getServer().getPluginManager().isPluginEnabled("SkinsRestorer")) {
-            getLogger().info("SkinsRestorer detected; join/leave heads will use its selected player skins.");
+            getLogger().info("SkinsRestorer detected; player images will use its selected skins.");
         }
 
         long period = Math.max(1L, getConfig().getLong("poll-interval-seconds", 2L)) * 20L;
@@ -154,7 +157,22 @@ public final class WhatsAppSRVPlugin extends JavaPlugin implements Listener {
     @EventHandler
     public void onDeath(PlayerDeathEvent event) {
         if (!enabled("forward.deaths") || event.getDeathMessage() == null) return;
-        sendAsync(format("formats.death").replace("%message%", safe(event.getDeathMessage())));
+        Player player = event.getEntity();
+        Location location = player.getLocation().clone();
+        String deathMessage = safe(event.getDeathMessage());
+        String caption = format("formats.death")
+                .replace("%message%", deathMessage)
+                .replace("%player%", safe(player.getDisplayName()))
+                .replace("%world%", safe(location.getWorld() == null ? "world" : location.getWorld().getName()))
+                .replace("%x%", Integer.toString(location.getBlockX()))
+                .replace("%y%", Integer.toString(location.getBlockY()))
+                .replace("%z%", Integer.toString(location.getBlockZ()));
+        if (!getConfig().getBoolean("event-cards.enabled", true)
+                || !getConfig().getBoolean("event-cards.deaths", true)) {
+            sendAsync(caption);
+            return;
+        }
+        sendDeathCard(player, deathMessage, caption, location);
     }
 
     @EventHandler
@@ -163,9 +181,191 @@ public final class WhatsAppSRVPlugin extends JavaPlugin implements Listener {
         Advancement advancement = event.getAdvancement();
         String key = advancement.getKey().getKey();
         if (key.startsWith("recipes/")) return;
-        sendAsync(format("formats.advancement")
+        Player player = event.getPlayer();
+        String title = advancementTitle(key);
+        String caption = format("formats.advancement")
                 .replace("%player%", safe(event.getPlayer().getDisplayName()))
-                .replace("%advancement%", safe(key.replace('/', ' '))));
+                .replace("%advancement%", safe(title));
+        if (!getConfig().getBoolean("event-cards.enabled", true)
+                || !getConfig().getBoolean("event-cards.advancements", true)) {
+            sendAsync(caption);
+            return;
+        }
+        sendAdvancementCard(player, key, title, caption);
+    }
+
+    private void sendAdvancementCard(Player player, String key, String title, String caption) {
+        PlayerImageCapture playerCapture = capturePlayerImage(player);
+        String category = advancementCategory(key);
+        String description = "Completed the " + category.toLowerCase() + " progression challenge.";
+        getServer().getScheduler().runTaskAsynchronously(this, () -> {
+            try {
+                BufferedImage head = renderCapturedHead(playerCapture);
+                byte[] png = EventCardRenderer.renderAdvancement(new EventCardRenderer.AdvancementCard(
+                        playerCapture.displayName, title, description, category, head));
+                bridge.sendImage(caption, png, "image/png",
+                        safeFilename(playerCapture.accountName) + "-advancement.png");
+            } catch (Exception error) {
+                getLogger().warning("Could not render advancement card for " + playerCapture.accountName
+                        + "; sending text instead: " + error.getMessage());
+                sendTextFallback(caption);
+            }
+        });
+    }
+
+    private void sendDeathCard(Player player, String deathMessage, String caption, Location location) {
+        PlayerImageCapture playerCapture = capturePlayerImage(player);
+        World world = location.getWorld();
+        int radius = Math.max(3, Math.min(8, getConfig().getInt("event-cards.death-map-radius", 5)));
+        String[][] terrain = world == null ? new String[0][0] : captureTerrain(world, location, radius);
+        String worldName = world == null ? "world" : safe(world.getName());
+        String environment = world == null ? "unknown" : world.getEnvironment().name();
+        String biome = world == null ? "unknown" : location.getBlock().getBiome().name();
+        int x = location.getBlockX();
+        int y = location.getBlockY();
+        int z = location.getBlockZ();
+        getServer().getScheduler().runTaskAsynchronously(this, () -> {
+            try {
+                BufferedImage head = renderCapturedHead(playerCapture);
+                byte[] png = EventCardRenderer.renderDeath(new EventCardRenderer.DeathCard(
+                        playerCapture.displayName, deathMessage, worldName, biome, environment,
+                        x, y, z, terrain, head));
+                String locationCaption = caption + "\n📍 *" + worldName
+                        + "* — X " + x + " Y " + y + " Z " + z;
+                bridge.sendImage(locationCaption, png, "image/png",
+                        safeFilename(playerCapture.accountName) + "-death-location.png");
+            } catch (Exception error) {
+                getLogger().warning("Could not render death card for " + playerCapture.accountName
+                        + "; sending text instead: " + error.getMessage());
+                sendTextFallback(caption + "\nLocation: " + worldName
+                        + " — X " + x + " Y " + y + " Z " + z);
+            }
+        });
+    }
+
+    /** Captures a small real block map around the death point while Bukkit access is safe. */
+    private String[][] captureTerrain(World world, Location center, int radius) {
+        int size = radius * 2 + 1;
+        String[][] terrain = new String[size][size];
+        int centerY = Math.max(0, Math.min(world.getMaxHeight() - 1, center.getBlockY()));
+        for (int row = 0; row < size; row++) {
+            for (int column = 0; column < size; column++) {
+                int blockX = center.getBlockX() + column - radius;
+                int blockZ = center.getBlockZ() + row - radius;
+                Material selected = world.getBlockAt(blockX, centerY, blockZ).getType();
+                if (selected == Material.AIR) {
+                    for (int drop = 1; drop <= 6 && centerY - drop >= 0; drop++) {
+                        Material candidate = world.getBlockAt(blockX, centerY - drop, blockZ).getType();
+                        if (candidate != Material.AIR) {
+                            selected = candidate;
+                            break;
+                        }
+                    }
+                }
+                terrain[row][column] = selected.name();
+            }
+        }
+        return terrain;
+    }
+
+    private PlayerImageCapture capturePlayerImage(Player player) {
+        return new PlayerImageCapture(
+                safe(player.getDisplayName()),
+                PlayerHeadRenderer.findBukkitSkinUrl(player),
+                PlayerHeadRenderer.findSkinsRestorerLoader(player),
+                player.getUniqueId(),
+                player.getName(),
+                Bukkit.getOnlineMode());
+    }
+
+    private BufferedImage renderCapturedHead(PlayerImageCapture player) throws IOException {
+        String restoredSkinUrl = PlayerHeadRenderer.findSkinsRestorerSkin(
+                player.skinsRestorerLoader, player.uuid, player.accountName, player.onlineMode);
+        String skinUrl = restoredSkinUrl == null ? player.bukkitSkinUrl : restoredSkinUrl;
+        byte[] headPng;
+        try {
+            headPng = PlayerHeadRenderer.renderPng(player.accountName, skinUrl);
+        } catch (IOException skinError) {
+            headPng = PlayerHeadRenderer.renderPng(player.accountName, null);
+        }
+        BufferedImage head = ImageIO.read(new ByteArrayInputStream(headPng));
+        if (head == null) throw new IOException("Rendered player head is not a readable PNG");
+        return head;
+    }
+
+    private void sendTextFallback(String caption) {
+        try {
+            bridge.send(caption);
+        } catch (IOException textError) {
+            getLogger().warning("WhatsApp fallback send failed: " + textError.getMessage());
+        }
+    }
+
+    private String safeFilename(String value) {
+        String safeName = safe(value).replaceAll("[^A-Za-z0-9._-]", "_");
+        return safeName.isEmpty() ? "player" : safeName;
+    }
+
+    private String advancementCategory(String key) {
+        int slash = key.indexOf('/');
+        String category = slash > 0 ? key.substring(0, slash) : "Minecraft";
+        return humanize(category);
+    }
+
+    private String advancementTitle(String key) {
+        // Bukkit 1.16 exposes only the namespaced key, so preserve the familiar
+        // in-game names for common advancements and humanize unknown/custom ones.
+        switch (key) {
+            case "story/root": return "Minecraft";
+            case "story/mine_stone": return "Stone Age";
+            case "story/upgrade_tools": return "Getting an Upgrade";
+            case "story/smelt_iron": return "Acquire Hardware";
+            case "story/obtain_armor": return "Suit Up";
+            case "story/lava_bucket": return "Hot Stuff";
+            case "story/iron_tools": return "Isn't It Iron Pick";
+            case "story/deflect_arrow": return "Not Today, Thank You";
+            case "story/form_obsidian": return "Ice Bucket Challenge";
+            case "story/mine_diamond": return "Diamonds!";
+            case "story/enter_the_nether": return "We Need to Go Deeper";
+            case "story/shiny_gear": return "Cover Me With Diamonds";
+            case "story/enchant_item": return "Enchanter";
+            case "story/cure_zombie_villager": return "Zombie Doctor";
+            case "story/follow_ender_eye": return "Eye Spy";
+            case "story/enter_the_end": return "The End?";
+            case "nether/return_to_sender": return "Return to Sender";
+            case "nether/find_bastion": return "Those Were the Days";
+            case "nether/obtain_ancient_debris": return "Hidden in the Depths";
+            case "nether/fast_travel": return "Subspace Bubble";
+            case "nether/uneasy_alliance": return "Uneasy Alliance";
+            case "nether/get_wither_skull": return "Spooky Scary Skeleton";
+            case "nether/summon_wither": return "Withering Heights";
+            case "nether/create_beacon": return "Bring Home the Beacon";
+            case "nether/create_full_beacon": return "Beaconator";
+            case "end/root": return "The End?";
+            case "end/kill_dragon": return "Free the End";
+            case "end/dragon_egg": return "The Next Generation";
+            case "end/enter_end_gateway": return "Remote Getaway";
+            case "end/respawn_dragon": return "The End... Again...";
+            case "end/dragon_breath": return "You Need a Mint";
+            case "end/find_end_city": return "The City at the End of the Game";
+            case "end/elytra": return "Sky's the Limit";
+            case "end/levitate": return "Great View From Up Here";
+            default:
+                int slash = key.lastIndexOf('/');
+                return humanize(slash >= 0 ? key.substring(slash + 1) : key);
+        }
+    }
+
+    private String humanize(String value) {
+        String normalized = safe(value).replace('_', ' ').replace('-', ' ').toLowerCase();
+        StringBuilder output = new StringBuilder(normalized.length());
+        boolean uppercase = true;
+        for (int index = 0; index < normalized.length(); index++) {
+            char character = normalized.charAt(index);
+            output.append(uppercase ? Character.toUpperCase(character) : character);
+            uppercase = Character.isWhitespace(character);
+        }
+        return output.toString();
     }
 
     private void sendPlayerFormat(String path, Player player, int onlineCount, String avatarToggle) {
@@ -630,6 +830,25 @@ public final class WhatsAppSRVPlugin extends JavaPlugin implements Listener {
             this.skinsRestorerLoader = skinsRestorerLoader;
             this.uuid = uuid;
             this.accountName = accountName;
+        }
+    }
+
+    private static final class PlayerImageCapture {
+        final String displayName;
+        final String bukkitSkinUrl;
+        final ClassLoader skinsRestorerLoader;
+        final UUID uuid;
+        final String accountName;
+        final boolean onlineMode;
+
+        PlayerImageCapture(String displayName, String bukkitSkinUrl, ClassLoader skinsRestorerLoader,
+                           UUID uuid, String accountName, boolean onlineMode) {
+            this.displayName = displayName;
+            this.bukkitSkinUrl = bukkitSkinUrl;
+            this.skinsRestorerLoader = skinsRestorerLoader;
+            this.uuid = uuid;
+            this.accountName = accountName;
+            this.onlineMode = onlineMode;
         }
     }
 

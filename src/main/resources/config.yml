@@ -46,6 +46,15 @@ status-card:
   max-player-heads: 10
   show-server-icon: true
 
+# Advancement and death events are sent as polished 960x540 image cards.
+# Death cards include exact coordinates and a real block map sampled around the death point.
+event-cards:
+  enabled: true
+  advancements: true
+  deaths: true
+  # Radius 5 produces an 11x11 local terrain map. Allowed range: 3-8.
+  death-map-radius: 5
+
 incoming:
   # Unicode emoji is preserved. Actual rendering depends on the Minecraft client's font/resource pack.
   max-message-codepoints: 512

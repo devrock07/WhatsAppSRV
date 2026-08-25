@@ -4,6 +4,22 @@ All notable changes to WhatsAppSRV are documented here.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and this project follows [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.1.0] - 2026-08-25
+
+### Added
+
+- Graphical 960x540 advancement cards with the player's selected SkinRestorer/Bukkit skin, a polished Minecraft-style layout, familiar vanilla advancement titles, and progression category.
+- Graphical death-location cards with the player's skin, death message, world, biome, dimension, and exact X/Y/Z coordinates.
+- A top-down location panel sampled from the real blocks around the death point, with a configurable 3-8 block radius and a marked center point.
+- `event-cards.enabled`, `event-cards.advancements`, `event-cards.deaths`, and `event-cards.death-map-radius` configuration options.
+- Renderer coverage for image dimensions, PNG validity, and the bridge's 2 MiB media limit.
+
+### Changed
+
+- Advancement messages now show readable in-game-style titles instead of raw keys such as `nether create_beacon`.
+- Advancement and death rendering runs asynchronously after Bukkit-only state is safely captured on the server thread.
+- Image failures fall back to the configured text message, with death coordinates preserved.
+
 ## [1.0.1] - 2026-08-22
 
 ### Added

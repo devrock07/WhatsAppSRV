@@ -53,6 +53,50 @@ final class RendererTest {
     }
 
     @Test
+    void advancementCardIncludesAvatarAndFitsBridgeLimit() throws Exception {
+        BufferedImage head = ImageIO.read(new ByteArrayInputStream(
+                PlayerHeadRenderer.renderPng("potatorkuja", null)));
+        byte[] png = EventCardRenderer.renderAdvancement(new EventCardRenderer.AdvancementCard(
+                "potatorkuja",
+                "Bring Home the Beacon",
+                "Completed the nether progression challenge.",
+                "Nether",
+                head));
+        assertWhatsAppCard(png);
+    }
+
+    @Test
+    void deathCardRendersRealTerrainSnapshotAndCoordinates() throws Exception {
+        String[][] terrain = new String[11][11];
+        for (int z = 0; z < terrain.length; z++) {
+            for (int x = 0; x < terrain[z].length; x++) {
+                terrain[z][x] = x < 4 ? "GRASS_BLOCK" : (z > 7 ? "WATER" : "STONE");
+            }
+        }
+        BufferedImage head = ImageIO.read(new ByteArrayInputStream(
+                PlayerHeadRenderer.renderPng("Kai_ymr", null)));
+        byte[] png = EventCardRenderer.renderDeath(new EventCardRenderer.DeathCard(
+                "Kai_ymr",
+                "Kai_ymr was slain by a Zombie",
+                "survival",
+                "plains",
+                "normal",
+                -142, 64, 387,
+                terrain,
+                head));
+        assertWhatsAppCard(png);
+    }
+
+    private static void assertWhatsAppCard(byte[] png) throws Exception {
+        assertTrue(png.length > 8);
+        assertTrue(png.length < 2 * 1024 * 1024, "WhatsApp bridge image limit");
+        BufferedImage decoded = ImageIO.read(new ByteArrayInputStream(png));
+        assertNotNull(decoded);
+        assertEquals(EventCardRenderer.WIDTH, decoded.getWidth());
+        assertEquals(EventCardRenderer.HEIGHT, decoded.getHeight());
+    }
+
+    @Test
     void bridgeRejectsInvalidMessageReferencesBeforeNetworkAccess() {
         BridgeClient client = new BridgeClient("http://127.0.0.1:1", "test-token-abcdefghijklmnopqrstuvwxyz");
         assertThrows(IllegalArgumentException.class, () -> client.reply(0L, "no", "❌"));

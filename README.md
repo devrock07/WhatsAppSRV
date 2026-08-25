@@ -47,6 +47,8 @@ WhatsAppSRV relays chat and server events, renders real player skins and a graph
 - Readable group and DM selection with `/wasrv chats` and `/wasrv select`
 - Two-way Unicode chat relay, including normal WhatsApp emoji
 - Join/leave cards with the player's real skin head and online count
+- Graphical advancement cards with the player's selected skin and polished advancement title
+- Death-location cards with exact coordinates and a real nearby-block map
 - Optional SkinsRestorer integration, Bukkit profile fallback, then Steve/Alex fallback
 - Death, advancement, startup, and shutdown notifications
 - Safe WhatsApp commands with direct replies and progress/result reactions
@@ -86,7 +88,7 @@ The plugin bytecode targets Java 8 for broad API compatibility, but modern Paper
 
 ## Quick start
 
-1. Download `WhatsAppSRV-1.0.1.jar` from the [latest GitHub release](https://github.com/devrock07/WhatsAppSRV/releases/latest).
+1. Download `WhatsAppSRV-1.1.0.jar` from the [latest GitHub release](https://github.com/devrock07/WhatsAppSRV/releases/latest).
 2. Upload it to the server's `plugins` directory.
 3. Start the Minecraft server and allow the first-start installation to finish. Small hosts can take several minutes.
 4. In WhatsApp, open **Linked devices → Link a device** and scan the QR shown in the Pterodactyl console. You can also download `plugins/WhatsAppSRV/bridge/qr.png` through the host file manager.
@@ -162,6 +164,14 @@ Each relay can be enabled independently under `forward` and its text can be chan
 - Non-recipe advancements
 - Server startup and shutdown
 
+Advancements are delivered as 960x540 trophy cards using the same
+SkinsRestorer-first avatar lookup as the status command. Deaths are delivered
+as location cards containing the death message, player avatar, world, biome,
+dimension, exact X/Y/Z coordinates, and a top-down map sampled from the real
+blocks around the death point. A server plugin cannot capture a player's
+camera view after death without a separate world renderer, so the block map is
+used as a deterministic location view.
+
 Vanilla Minecraft chat cannot embed a WhatsApp sticker, image, video, document, location, or voice note. WhatsAppSRV preserves those messages as readable labels such as `[Sticker]`, `[Image]`, and `[Voice message]`, including a text caption when available. Normal Unicode emoji is kept unchanged; its appearance in Minecraft depends on the client's font or resource pack.
 
 ## Player skins and status graphics
@@ -187,6 +197,7 @@ The generated configuration is `plugins/WhatsAppSRV/config.yml`. Important secti
 | `whatsapp-commands.admin-sender-ids` | Optional explicit administrators for limited whitelist commands. |
 | `whatsapp-commands.console` | Disabled-by-default exact console allowlists. |
 | `player-heads` | Join/leave image toggles. |
+| `event-cards` | Advancement/death image toggles and death-map radius. |
 | `forward` | Individual relay event toggles. |
 | `formats` | Outbound and inbound message templates. |
 | `incoming.max-message-codepoints` | Maximum WhatsApp text relayed into Minecraft. |
